@@ -1,0 +1,36 @@
+﻿/*
+ * $Id$
+ *
+ * Coursework – The main style of the Futoshiki puzzle.
+ *
+ * This file is the result of my own work. Any contributions to the work by third parties,
+ * other than tutors, are stated clearly below this declaration. Should this statement prove to
+ * be untrue I recognise the right and duty of the Board of Examiners to take appropriate
+ * action in line with the university's regulations on assessment.
+ */
+ 
+body
+{
+}
+
+#FutoshikiTable 
+{
+	width: 300px;
+	height: 300px;
+}
+
+
+#FutoshikiTable td 
+{
+	border: solid 1px;	
+	text-align: center;
+	width: 25px;
+	height: 25px;
+}
+
+#FutoshikiTable td.sign 
+{
+	width: 12px;
+	height: 12px;
+	border: none;
+}
