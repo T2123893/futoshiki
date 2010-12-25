@@ -9,7 +9,6 @@
  * action in line with the university's regulations on assessment. 
  */
 
-using System;
 using System.Text;
 
 namespace Models
@@ -19,58 +18,34 @@ namespace Models
     /// </summary>
     public class Cell
     {
-//        private Cell[] _cells;
-
-        public Cell() {}
-
-//        public Cell(int size)
-//        {
-//            Length = size*size - 1;
-//            _cells = new Cell[Length];
-//            Candidates = new int[size];
-//            for(int n = 1; n <= size; n++)
-//            {
-//                Candidates[n - 1] = n;
-//            }
-//            for (int index = 0; index < Length; index++)
-//            {
-//                this[index].Row = index / size;
-//                this[index].Column = index % size;
-//            }
-//        }
-
-//        public Cell this[int index]
-//        {
-//            get
-//            {
-//                if (index < 0 || index > _cells.Length)
-//                {
-//                    throw new IndexOutOfRangeException();
-//                }
-//                return _cells[index];
-//            }
-//            set
-//            {
-//                if (index < 0 || index > _cells.Length)
-//                {
-//                    throw new IndexOutOfRangeException();
-//                }
-//                _cells[index] = value;
-//            }
-//        }
-
-//        public int Length { get; private set; }
-
-        //public int Index { get; set; }
-
+        /// <summary>
+        /// The column number of a Cell.
+        /// </summary>
         public int Column { get; set; }
 
+        /// <summary>
+        /// The Row number of a Cell
+        /// </summary>
         public int Row { get; set; }
 
+        /// <summary>
+        /// The Value of a Cell
+        /// </summary>
         public string Value { get; set; }
 
+        /// <summary>
+        /// The candidates list of a Cell
+        /// </summary>
         public int[] Candidates { get; set; }
 
+        /// <summary>
+        /// The candidates freeezing records of a cell
+        /// </summary>
+        public int[] FrzRecord { get; set; }
+
+        /// <summary>
+        /// To indicate this is a numeric cell or sign cell
+        /// </summary>
         public bool IsNumeric
         {
             get { return 0 == Row%2 && 0 == Column%2; }
@@ -79,20 +54,17 @@ namespace Models
         public override string ToString()
         {
             StringBuilder str = new StringBuilder("{");
-            str.AppendFormat("\"Column\":{0}", Column)
+            str.AppendFormat("\"IsNumeric\":{0}",IsNumeric)
                 .AppendFormat(",\"Row\":{0}", Row)
+                .AppendFormat(",\"Column\":{0}", Column)
                 .AppendFormat(",\"Value\":\"{0}\"", Value)
                 .Append(",\"Candidates\":[");
             PrintArray(Candidates, str);
-            str.Append("]}").ToString();
+            str.AppendFormat("],\"FrzRecord\":[");
+            PrintArray(FrzRecord,str);
+            str.Append("]}");
 
             return str.ToString();
-//            
-//                    "{\"Column\":") + Column + 
-//                   ",\"Row\":" + Row + 
-//                   ",\"Value\":\"" + Value + 
-//                   "\",\"Candidates\":" + PrintArray(Candidates) +
-//                   "}";
         }
 
         public override bool Equals(object obj)
@@ -120,7 +92,7 @@ namespace Models
 
         private void PrintArray(int[] array, StringBuilder str)
         {
-            if (null == array)
+            if (null == array || 0 == array.Length)
             {
                 str.AppendFormat("{0}", "null");
                 return;
