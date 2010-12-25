@@ -1,7 +1,8 @@
 ﻿/**
- * $Id
+ * $Id$
  */
 
+using System;
 using BLL;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Models;
@@ -68,40 +69,60 @@ namespace Test
         #endregion
 
         /// <summary>
-        ///A test for DoBlankCells
+        ///A test for GetCells
         ///</summary>
         [TestMethod()]
-        public void DoBlankCellsTest()
+        public void GetCellsTest()
         {
-            int seedSize = 3;
+            int seedSize = 9;
             int rowSize = 2*seedSize - 1;
             int candidatesAmount = seedSize;
             int cellsAmount = rowSize*rowSize;
-            CellService target = new CellService();
+            CellService target = new CellService(seedSize);
 
-            Cell[] actualCells = target.DoBlankCells(seedSize);          
+            Cell[] actualCells = target.GetCells();  
+            showFutoshiki(actualCells, seedSize);
+            
+            // check the cells amount
             Assert.AreEqual(cellsAmount, actualCells.Length);
-            Assert.AreEqual(candidatesAmount,actualCells[0].Candidates.Length);
 
-            Cell expectedCell = new Cell {Row = 4, Column = 4, Candidates = new[]{1,2,3}};
-            Assert.AreEqual(expectedCell.ToString(), actualCells[24].ToString());
+//             to remove candidate from current cell after setting value
+//            Assert.AreEqual(candidatesAmount-1,actualCells[0].Candidates.Length);
 
-            Cell signCell = new Cell {Row = 3, Column = 2};
-            Assert.AreEqual(signCell.ToString(), actualCells[17].ToString());
+//             deal with related row
+//            Assert.AreEqual(candidatesAmount - 1, actualCells[2].Candidates.Length);
+
+//             deal with related column
+//            Assert.AreEqual(candidatesAmount-1,actualCells[2*rowSize].Candidates.Length);
+
+//             check a non-numeric cell
+            Cell signCell = new Cell {Row = 1, Column = 8};
+            Assert.AreEqual(signCell.IsNumeric, actualCells[rowSize].IsNumeric);
+
         }
 
-        /// <summary>
-        /// A test ofr DoRandomVal
-        /// </summary>
-        [TestMethod()]
-        public void DoRandomValTest()
+        private void showFutoshiki(Cell[] actualCells, int rowSize)
         {
-            CellService target = new CellService();
-            Cell[] actualCells = target.DoRandomVal();            
-            Assert.AreNotEqual(null,actualCells[0].Value);
-            Assert.AreEqual(null,actualCells[1].Value);
-            Assert.AreEqual(4,actualCells[0].Candidates.Length);
+            Console.WriteLine("");
+
+            int n = 0;
+            for (int i = 0; i < actualCells.Length; i++)
+            {                               
+                if (actualCells[i].IsNumeric)
+                {
+                    Console.Write("{0, 3}", actualCells[i].Value);
+                    n++;
+                }
+                if (n == rowSize)
+                {                        
+                    Console.WriteLine("");
+                    n = 0;
+                }
+            }
         }
 
+
+
+        
     }
 }
