@@ -74,14 +74,14 @@ namespace Test
         [TestMethod()]
         public void GetCellsTest()
         {
-            int seedSize = 9;
+            int seedSize = 8;
             int rowSize = 2*seedSize - 1;
             int candidatesAmount = seedSize;
             int cellsAmount = rowSize*rowSize;
             CellService target = new CellService(seedSize);
 
             Cell[] actualCells = target.GetCells();  
-            showFutoshiki(actualCells, seedSize);
+            showFutoshiki(actualCells, rowSize);
             
             // check the cells amount
             Assert.AreEqual(cellsAmount, actualCells.Length);
@@ -108,11 +108,11 @@ namespace Test
             int n = 0;
             for (int i = 0; i < actualCells.Length; i++)
             {                               
-                if (actualCells[i].IsNumeric)
-                {
+//                if (actualCells[i].IsNumeric)
+//                {
                     Console.Write("{0, 3}", actualCells[i].Value);
                     n++;
-                }
+//                }
                 if (n == rowSize)
                 {                        
                     Console.WriteLine("");

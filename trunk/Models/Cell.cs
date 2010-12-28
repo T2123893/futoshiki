@@ -44,11 +44,27 @@ namespace Models
         public int[] FrzRecord { get; set; }
 
         /// <summary>
-        /// To indicate this is a numeric cell or sign cell
+        /// To indicate this is a numeric cell
         /// </summary>
         public bool IsNumeric
         {
             get { return 0 == Row%2 && 0 == Column%2; }
+        }
+
+        /// <summary>
+        /// To indicate this is a sign cell on vertical.
+        /// </summary>
+        public bool IsVerticalSign
+        {
+            get { return 0 != Row%2 && 0 == Column%2; }
+        }
+
+        /// <summary>
+        /// To indicate this is a sign cell on horizontal.
+        /// </summary>
+        public bool IsHorizontalSign
+        {
+            get { return 0 == Row%2 && 0 != Column%2; }
         }
 
         public override string ToString()
