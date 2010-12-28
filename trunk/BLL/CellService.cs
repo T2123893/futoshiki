@@ -59,6 +59,26 @@ namespace BLL
         private readonly Random _rdm;
 
         /// <summary>
+        /// A horizontal great-than sign "＞";
+        /// </summary>
+        private const string HorizontalGreater = "\xff1e";
+
+        /// <summary>
+        /// A horizontal less-than sign "＜";
+        /// </summary>
+        private const string HorizontalLesser = "\xff1c";
+
+        /// <summary>
+        /// A vertical great-than sign "∨";
+        /// </summary>
+        private const string VerticalGreater = "\x2228";
+
+        /// <summary>
+        /// A vertical less-than sign "∧";
+        /// </summary>
+        private const string VerticalLesser = "\x2227";
+
+        /// <summary>
         /// The default constructor which only can have a standard (5*5) game 
         /// of Futoshiki.
         /// </summary>
@@ -106,17 +126,115 @@ namespace BLL
             }
         }
 
+
         /// <summary>
-        /// Obtain a Futoshiki Cells according to given size of initilization 
+        /// Generate a Futoshiki Cells according to given size of initilization
         /// stage. whick will fill numeric cells up.
         /// </summary>
         /// <returns>A Cell collection</returns>
         public Cell[] GetCells()
         {
-            return GetCells(0) ? _cells : null;
+            // TODO: If save the numeric cells as a solution to a XML file here?
+
+            return DoNumericCells(0) && DoSignCells() ? _cells : null;
         }
 
-        private bool GetCells(int i)
+        // Generating inequality symbol randomly.
+        private bool DoSignCells()
+        {
+            int blanksCount = (_scalarSize - 1)*(_scalarSize - 1);
+            int numCount = _scalarSize*_scalarSize;
+            int[] idxesNumCells = new int[numCount];
+            int signsCount = _cellsAmount - numCount - blanksCount;
+            int[] idxesOfSigns = new int[signsCount];
+            for (int i = 0, s = 0, n = 0; i < _cells.Length; i++)
+            {
+                if (_cells[i].IsHorizontalSign || _cells[i].IsVerticalSign)
+                {
+                    // get ready an array that contains all indexes of sign cells      
+                    idxesOfSigns[s] = i;
+                    ++s;
+                }
+                else if (_cells[i].IsNumeric)
+                {
+                    // get ready an array that contains all indexes of numeric cells.
+                    idxesNumCells[n] = i;
+                    ++n;
+                }
+            }
+
+            bool isSuccess = true;
+
+            // get ready a quantity of inequality symbols
+            int sMin = _scalarSize - 1;
+            int sMax = _scalarSize*_scalarSize/2;
+            int signsQuantity = _rdm.Next(sMin, sMax);
+            isSuccess &= DoSignCells(idxesOfSigns, signsQuantity);
+
+            // get ready a quantity of numeric number
+            int numsQuantity = _rdm.Next(sMax - signsQuantity);
+            int veiled = numCount - numsQuantity;
+            isSuccess &= VeilNumCells(idxesNumCells, veiled);
+
+            return isSuccess;
+        }
+
+        // To veil some numeric cells
+        private bool VeilNumCells(int[] idxesNumCells, int veiled)
+        {
+            while (idxesNumCells.Length > veiled)
+            {
+                int i = _rdm.Next(idxesNumCells.Length);
+                RemoveElement(ref idxesNumCells, idxesNumCells[i]);
+            }
+
+            if (idxesNumCells.Length <= 0)
+            {
+                return true;
+            }
+
+            int idx = idxesNumCells[idxesNumCells.Length - 1];
+            _cells[idx].Value = null;
+            RemoveElement(ref idxesNumCells, idxesNumCells[idxesNumCells.Length - 1]);
+
+            return VeilNumCells(idxesNumCells, veiled);
+        }
+
+        // To put some less-than and great-than signs into cells.
+        private bool DoSignCells(int[] idxesOfsigns, int signsQuantity)
+        {
+            while (idxesOfsigns.Length > signsQuantity)
+            {
+                int v = idxesOfsigns[_rdm.Next(idxesOfsigns.Length)];
+                RemoveElement(ref idxesOfsigns, v);
+            }
+
+            if (idxesOfsigns.Length <= 0)
+            {
+                return true;
+            }
+
+            int i = idxesOfsigns[_rdm.Next(idxesOfsigns.Length)];
+            if (_cells[i].IsHorizontalSign)
+            {
+                bool g = int.Parse(_cells[i - 1].Value) > int.Parse(_cells[i + 1].Value);
+                _cells[i].Value = g ? HorizontalGreater : HorizontalLesser;
+                RemoveElement(ref idxesOfsigns, i);
+                return DoSignCells(idxesOfsigns, signsQuantity);
+            }
+            if (_cells[i].IsVerticalSign)
+            {
+                bool g = int.Parse(_cells[i - _rowSize].Value) > int.Parse(_cells[i + _rowSize].Value);
+                _cells[i].Value = g ? VerticalGreater : VerticalLesser;
+                RemoveElement(ref idxesOfsigns, i);
+                return DoSignCells(idxesOfsigns, signsQuantity);
+            }
+
+            return false;
+        }
+
+        // To generate numeric cells.
+        private bool DoNumericCells(int i)
         {
             bool isSuccess = false;
             bool isProceed = false;
@@ -128,22 +246,18 @@ namespace BLL
             int idx = cell.Row*_rowSize + cell.Column;
             if (!string.IsNullOrEmpty(cell.Value))
             {
-//                Console.WriteLine("GetCells(int) - The Cell({0},{1}) is already got value, is going to skip to next cell ... ...",cell.Row,cell.Column);
-                return GetCells(idx + 1);
+                return DoNumericCells(idx + 1);
             }
             int[] backup = new int[cell.Candidates.Length];
             Array.Copy(cell.Candidates, backup, backup.Length);
-//            Console.WriteLine("\n-----------------\nGetCells(int) - Enter Cell({0},{1}): {2}", cell.Row, cell.Column,cell);
 
             if (TryCandidates(cell))
             {
-//                Console.WriteLine("GetCells(int) - Successful to fill Cell({0},{1})", cell.Row, cell.Column);
-                isSuccess = GetCells(idx + 1);
+                isSuccess = DoNumericCells(idx + 1);
                 if (isSuccess)
                 {
                     return true;
                 }
-//                Console.WriteLine("\n-------------- Back Line -----------------\n Cell({0},{1})", cell.Row, cell.Column);
                 ActivateRelatedCandidatesOnRow(cell);
                 ActivateRelatedCandidatesOnColumn(cell);
                 isProceed = true;
@@ -151,17 +265,15 @@ namespace BLL
 
             cell.Candidates = backup;
             cell.Value = null;
-//            Console.WriteLine("GetCells(int) - Failed to fill Cell({0},{1}). Recover condidates and back to previous ... ...", cell.Row, cell.Column);
-
             if (isProceed)
             {
-                Console.WriteLine("GetCells(int)-----continue to fill Cell({0},{1})", cell.Row, cell.Column);
-                isSuccess = GetCells(idx);
+                isSuccess = DoNumericCells(idx);
             }
 
             return isSuccess;
         }
 
+        // To choose a number from candidates array.
         private bool TryCandidates(Cell cell)
         {
             if (!SetCellValue(cell))
@@ -188,25 +300,21 @@ namespace BLL
 
         private bool FreezeRelatedCandidatesOnRow(Cell cell)
         {
-//            Console.WriteLine("FreezeRelatedCandidatesOnRow() - To freeze the row({0}) ......", cell.Row);
             return HandleRelatedCells(cell, false, true);
         }
 
         private bool FreezeRelatedCandidatesOnColumn(Cell cell)
         {
-//            Console.WriteLine("FreezeRelatedCandidatesOnRow() - To freeze the column({0}) ......", cell.Column);
             return HandleRelatedCells(cell, false, false);
         }
 
         private bool ActivateRelatedCandidatesOnRow(Cell cell)
         {
-//            Console.WriteLine("ActivateRelatedCandidatesOnRow() - To activate the row({0}) ......", cell.Row);
             return HandleRelatedCells(cell, true, true);
         }
 
         private bool ActivateRelatedCandidatesOnColumn(Cell cell)
         {
-//            Console.WriteLine("ActivateRelatedCandidatesOnColumn() - To activate the column({0}) ......", cell.Column);
             return HandleRelatedCells(cell, true, false);
         }
 
@@ -216,7 +324,6 @@ namespace BLL
             if (cell.FrzRecord[candidate - 1] > 0)
             {
                 cell.FrzRecord[candidate - 1]--;
-//                    Console.WriteLine("Activate() - There is a duplicate freeze last time, so Candidate {0} decreased", candidate);
             }
             else
             {
@@ -224,7 +331,6 @@ namespace BLL
                 Array.Copy(cell.Candidates, temp, cell.Candidates.Length);
                 temp[temp.Length - 1] = candidate;
                 cell.Candidates = temp;
-//                    Console.WriteLine("Activate() - Add candidate {0} to the Cell", candidate);
             }
         }
 
@@ -235,36 +341,28 @@ namespace BLL
 
             if (0 == availableCount && string.IsNullOrEmpty(cell.Value))
             {
-//                Console.WriteLine("Freeze() - Failed because {0} is the only one candidate", candidate);
                 isFrz = false;
             }
 
             if (1 == availableCount && string.IsNullOrEmpty(cell.Value))
             {
-//                Console.WriteLine("Freeze() - Only one candidate left, set {0} up",candidate);
                 int onlyValue = cell.Candidates[0];
                 cell.Value = onlyValue.ToString();
                 RemoveCandidate(cell, onlyValue);
 
                 if (!FreezeRelatedCandidatesOnRow(cell))
                 {
-//                    Console.WriteLine("Freeze() - using only candidate failed on row check, start rollback ......");
                     ActivateRelatedCandidatesOnRow(cell);
                     cell.Candidates = new[] {onlyValue};
                     isFrz = false;
-//                    Console.WriteLine("Freeze() - end Rollback on Row");
                 }
-//                Console.WriteLine("Freeze() - using only candidate is successful on row check :)");
 
                 if (!FreezeRelatedCandidatesOnColumn(cell))
                 {
-//                    Console.WriteLine("Freeze() - using only candidate failed on column check, start rollback ......");
                     ActivateRelatedCandidatesOnColumn(cell);
                     cell.Candidates = new[] {onlyValue};
                     isFrz = false;
-//                    Console.WriteLine("Freeze() - end Rollback on column");
                 }
-//                Console.WriteLine("Freeze() - using only candidate is successful on column check :)");
             }
 
             return isFrz;
@@ -275,14 +373,16 @@ namespace BLL
             bool isSuccess = true;
             int candidate = int.Parse(cell.Value);
             int startIndex = isRow ? cell.Row*_rowSize : cell.Column;
-            int endIndex = isRow ? (cell.Row + 1)*_rowSize - 1 : _cellsAmount - _rowSize + cell.Column;
+            int endIndex = isRow 
+                ? (cell.Row + 1)*_rowSize - 1 
+                : _cellsAmount - _rowSize + cell.Column;
             int increase = isRow ? 1 : _rowSize;
 
             for (; startIndex <= endIndex; startIndex += increase)
             {
                 bool doNothing = isRow
-                                     ? startIndex%_rowSize == cell.Column || !_cells[startIndex].IsNumeric
-                                     : startIndex/_rowSize == cell.Row || !_cells[startIndex].IsNumeric;
+                     ? startIndex%_rowSize == cell.Column || !_cells[startIndex].IsNumeric
+                     : startIndex/_rowSize == cell.Row || !_cells[startIndex].IsNumeric;
                 if (doNothing)
                 {
                     //do nothing if this is the current assigned cell OR is not a numeric cell.
@@ -305,6 +405,26 @@ namespace BLL
             }
 
             return isSuccess;
+        }
+
+        private bool RemoveElement(ref int[] array, int v)
+        {
+            try
+            {
+                int i = Array.IndexOf(array, v);
+                if (v != array[array.Length - 1])
+                {
+                    array[i] = array[array.Length - 1];
+                }
+                int[] temp = new int[array.Length - 1];
+                Array.Copy(array, temp, array.Length - 1);
+                array = temp;
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         private bool RemoveCandidate(Cell cell, int cdt)
@@ -361,6 +481,5 @@ namespace BLL
             }
             return _cells[index];
         }
-
     }
 }
