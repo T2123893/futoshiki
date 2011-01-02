@@ -19,7 +19,7 @@ namespace BLL
     /// automatically generate Futoshiki cells according to given seed number.
     /// The game can be any size from 4*4 upwards.
     /// </summary>
-    public class CellService
+    public class CellService : ICellService
     {
         /// <summary>
         /// The constant is a default size of the Futoshiki. It will be used when 
@@ -126,13 +126,12 @@ namespace BLL
             }
         }
 
-
         /// <summary>
         /// Generate a Futoshiki Cells according to given size of initilization
         /// stage. whick will fill numeric cells up.
         /// </summary>
         /// <returns>A Cell collection</returns>
-        public Cell[] GetCells()
+        public Cell[] DoGrid()
         {
             // TODO: If save the numeric cells as a solution to a XML file here?
 
