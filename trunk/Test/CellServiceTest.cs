@@ -74,13 +74,13 @@ namespace Test
         [TestMethod()]
         public void GetCellsTest()
         {
-            int seedSize = 8;
+            int seedSize = 4;
             int rowSize = 2*seedSize - 1;
             int candidatesAmount = seedSize;
             int cellsAmount = rowSize*rowSize;
             CellService target = new CellService(seedSize);
 
-            Cell[] actualCells = target.GetCells();  
+            Cell[] actualCells = target.DoGrid();  
             showFutoshiki(actualCells, rowSize);
             
             // check the cells amount
