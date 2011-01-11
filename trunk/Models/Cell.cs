@@ -1,15 +1,17 @@
 ﻿/**
  * $Id$
+ * 
+ * Coursework – Futoshiki.Models
  *
- * Coursework – The domian model layer of the Futoshiki puzzle.
- *
- * This file is the result of my own work. Any contributions to the work by third parties,
- * other than tutors, are stated clearly below this declaration. Should this statement prove to
- * be untrue I recognise the right and duty of the Board of Examiners to take appropriate
- * action in line with the university's regulations on assessment. 
+ * This file is the result of my own work. Any contributions to the work by 
+ * third parties, other than tutors, are stated clearly below this declaration. 
+ * Should this statement prove to be untrue I recognise the right and duty of 
+ * the Board of Examiners to take appropriate action in line with the university's 
+ * regulations on assessment. 
  */
 
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Models
 {
@@ -19,36 +21,47 @@ namespace Models
     public class Cell
     {
         /// <summary>
-        /// The column number of a Cell.
-        /// </summary>
-        public int Column { get; set; }
-
-        /// <summary>
         /// The Row number of a Cell
         /// </summary>
+        [XmlAttribute]
         public int Row { get; set; }
+
+        /// <summary>
+        /// The column number of a Cell.
+        /// </summary>
+        [XmlAttribute]
+        public int Col { get; set; }
+        
+        /// <summary>
+        /// To indicate the numeric cell cannot be set by client.
+        /// </summary>
+        [XmlAttribute]
+        public bool IsWritable { get; set; }
 
         /// <summary>
         /// The Value of a Cell
         /// </summary>
-        public string Value { get; set; }
+        [XmlText]
+        public string Val { get; set; }
 
         /// <summary>
         /// The candidates list of a Cell
         /// </summary>
+        [XmlIgnore]
         public int[] Candidates { get; set; }
 
         /// <summary>
-        /// The candidates freeezing records of a cell
+        /// To record which candidates were removed repeatedly.
         /// </summary>
-        public int[] FrzRecord { get; set; }
+        [XmlIgnore]
+        public int[] Repeat { get; set; }
 
         /// <summary>
         /// To indicate this is a numeric cell
         /// </summary>
-        public bool IsNumeric
+        public bool IsNum
         {
-            get { return 0 == Row%2 && 0 == Column%2; }
+            get { return 0 == Row%2 && 0 == Col%2; }
         }
 
         /// <summary>
@@ -56,7 +69,7 @@ namespace Models
         /// </summary>
         public bool IsVerticalSign
         {
-            get { return 0 != Row%2 && 0 == Column%2; }
+            get { return 0 != Row%2 && 0 == Col%2; }
         }
 
         /// <summary>
@@ -64,23 +77,17 @@ namespace Models
         /// </summary>
         public bool IsHorizontalSign
         {
-            get { return 0 == Row%2 && 0 != Column%2; }
+            get { return 0 == Row%2 && 0 != Col%2; }
         }
 
         public override string ToString()
         {
-            StringBuilder str = new StringBuilder("{");
-            str.AppendFormat("\"IsNumeric\":{0}",IsNumeric)
-                .AppendFormat(",\"Row\":{0}", Row)
-                .AppendFormat(",\"Column\":{0}", Column)
-                .AppendFormat(",\"Value\":\"{0}\"", Value)
-                .Append(",\"Candidates\":[");
-            PrintArray(Candidates, str);
-            str.AppendFormat("],\"FrzRecord\":[");
-            PrintArray(FrzRecord,str);
-            str.Append("]}");
-
-            return str.ToString();
+            return new StringBuilder("{")
+                .AppendFormat("\"Row\":{0}", Row)
+                .AppendFormat(",\"Col\":{0}", Col)
+                .AppendFormat(",\"Val\":\"{0}\"", Val)
+                .AppendFormat(",\"IsWritable\":{0}", IsWritable)
+                .Append("}").ToString();
         }
 
         public override bool Equals(object obj)
@@ -95,31 +102,16 @@ namespace Models
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return other.Column == Column && other.Row == Row;
+            return other.Col == Col && other.Row == Row;
         }
 
         public override int GetHashCode()
         {
             unchecked
             {
-                return (Column*397) ^ Row;
+                return (Col*397) ^ Row;
             }
         }
 
-        private void PrintArray(int[] array, StringBuilder str)
-        {
-            if (null == array || 0 == array.Length)
-            {
-                str.AppendFormat("{0}", "null");
-                return;
-            }
-
-            foreach (int a in array)
-            {
-                str.AppendFormat("{0},", a);
-            }
-
-            str.Remove(str.Length-1, 1);
-        }
     }
 }

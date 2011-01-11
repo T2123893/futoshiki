@@ -11,7 +11,7 @@
 namespace Web {
     
     
-    public partial class Default {
+    public partial class UserRegister {
         
         /// <summary>
         /// form1 control.
@@ -47,7 +47,7 @@ namespace Web {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.LinkButton LinkLogout;
+        protected global::System.Web.UI.WebControls.HyperLink LinkLogout;
         
         /// <summary>
         /// SpanLogin control.
@@ -59,75 +59,120 @@ namespace Web {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl SpanLogin;
         
         /// <summary>
-        /// MsgDiv control.
+        /// LblMsg control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl MsgDiv;
+        protected global::System.Web.UI.WebControls.Label LblMsg;
         
         /// <summary>
-        /// FutoshikiTable control.
+        /// Email control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Table FutoshikiTable;
+        protected global::System.Web.UI.WebControls.TextBox Email;
         
         /// <summary>
-        /// ButChkSln control.
+        /// EmailRequiredFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button ButChkSln;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator EmailRequiredFieldValidator;
         
         /// <summary>
-        /// BtnShowSln control.
+        /// EmailRegularExpressionValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnShowSln;
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator EmailRegularExpressionValidator;
         
         /// <summary>
-        /// BtnSave control.
+        /// Username control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnSave;
+        protected global::System.Web.UI.WebControls.TextBox Username;
         
         /// <summary>
-        /// ScaleList control.
+        /// UsernameRequiredFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ScaleList;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator UsernameRequiredFieldValidator;
         
         /// <summary>
-        /// GameScaleDS control.
+        /// Password control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.XmlDataSource GameScaleDS;
+        protected global::System.Web.UI.WebControls.TextBox Password;
         
         /// <summary>
-        /// HidData control.
+        /// PwdRequiredFieldValidator control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField HidData;
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator PwdRequiredFieldValidator;
+        
+        /// <summary>
+        /// PwdLenthValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator PwdLenthValidator;
+        
+        /// <summary>
+        /// ConfirmPassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ConfirmPassword;
+        
+        /// <summary>
+        /// CfmPwdRequiredFieldValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator CfmPwdRequiredFieldValidator;
+        
+        /// <summary>
+        /// PswCompareValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CompareValidator PswCompareValidator;
+        
+        /// <summary>
+        /// Register control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button Register;
     }
 }

@@ -1,18 +1,16 @@
 ﻿/**
-* $Id$
-*
-* Coursework – Javascript file.
-*
-* This file is the result of my own work. Any contributions to the work by third parties,
-* other than tutors, are stated clearly below this declaration. Should this statement prove to
-* be untrue I recognise the right and duty of the Board of Examiners to take appropriate
-* action in line with the university's regulations on assessment. 
-*/
- 
+ * $Id$
+ *
+ * Coursework – Futoshiki.Web
+ *
+ * This file is the result of my own work. Any contributions to the work by 
+ * third parties, other than tutors, are stated clearly below this declaration. 
+ * Should this statement prove to be untrue I recognise the right and duty of 
+ * the Board of Examiners to take appropriate action in line with the university's 
+ * regulations on assessment. 
+ */
 
 
-//document.oncontextmenu=new Function("event.returnValue=false;");
-//document.onselectstart=new Function("event.returnValue=false;");
 document.onkeydown = onKeyPressed;
 
 var currentCheckedCell;
@@ -21,9 +19,15 @@ var HG = "＞";
 var HL = "＜";
 var VG = "∨";
 var VL = "∧";
+var f = {};
 
 window.onload = function() {
     rowSize = FutoshikiTable.rows.length;
+    preprocess();
+}
+
+function hidMsg() {
+    MsgDiv.style.display = "none";
 }
 
 function recoverColorOfSign(row, col) {    
@@ -32,9 +36,10 @@ function recoverColorOfSign(row, col) {
     if (left &&  left.attributes.ishs && left.innerText != "") {
         var b4Left = $(row + "_" + (col-2));
         if (b4Left && b4Left.attributes.isnum && b4Left.innerText != "") {
-            var isG = left.innerText == HG && b4Left.innerText > currentCheckedCell.innerText;
-            var isL = left.innerText == HL && b4Left.innerText < currentCheckedCell.innerText;
-            if (isG || isL) { left.style.color = "#000000"; }
+            var val = currentCheckedCell.innerText;
+            var isG = left.innerText == HG && b4Left.innerText > val;
+            var isL = left.innerText == HL && b4Left.innerText < val;
+            if (isG || isL || val=="") { left.style.color = "#000000"; }
             else { left.style.color = "red"; }
         } 
     } 
@@ -42,9 +47,10 @@ function recoverColorOfSign(row, col) {
     if (right && right.attributes.ishs && right.innerText != "") {
         var afterRight = $(row + "_" + (col+2));
         if (afterRight && afterRight.attributes.isnum && afterRight.innerText != "") {
-            var isG = right.innerText == HG && currentCheckedCell.innerText > afterRight.innerText;
-            var isL = right.innerText == HL && currentCheckedCell.innerText < afterRight.innerText;
-            if (isG || isL) { right.style.color = "#000000"; }
+            var val = currentCheckedCell.innerText;
+            var isG = right.innerText == HG && val > afterRight.innerText;
+            var isL = right.innerText == HL && val < afterRight.innerText;
+            if (isG || isL || val=="") { right.style.color = "#000000"; }
             else { right.style.color = "red"; }
         }    
     }
@@ -53,9 +59,10 @@ function recoverColorOfSign(row, col) {
     if (up && up.attributes.isvs && up.innerText != "") {
         var b4Up = $((row-2) + "_" + col);
         if (b4Up && b4Up.attributes.isnum && b4Up.innerText != "") {
-            var isG = up.innerText == VG && b4Up.innerText > currentCheckedCell.innerText;
-            var isL = up.innerText == VL && b4Up.innerText < currentCheckedCell.innerText;
-            if (isG || isL) { up.style.color = "#000000"; }
+            var val = currentCheckedCell.innerText;
+            var isG = up.innerText == VG && b4Up.innerText > val;
+            var isL = up.innerText == VL && b4Up.innerText < val;
+            if (isG || isL || val=="") { up.style.color = "#000000"; }
             else { up.style.color = "red"; }
         }
     } 
@@ -64,15 +71,14 @@ function recoverColorOfSign(row, col) {
     if (down && down.attributes.isvs && down.innerText != "") {
         var afterDown = $((row+2) + "_" + col);
         if (afterDown && afterDown.attributes.isnum && afterDown.innerText != "") {
-            var isG = down.innerText == VG && currentCheckedCell.innerText > afterDown.innerText;
-            var isL = down.innerText == VL && currentCheckedCell.innerText < afterDown.innerText;
-            if (isG || isL) { down.style.color = "#000000"; }
+            var val = currentCheckedCell.innerText;
+            var isG = down.innerText == VG && val > afterDown.innerText;
+            var isL = down.innerText == VL && val < afterDown.innerText;
+            if (isG || isL || val=="") { down.style.color = "#000000"; }
             else {down.style.color = "red"; }
         }
     }
-        
-    
-    
+                
 }
 
 function checkInequalities(cell) {
@@ -94,46 +100,9 @@ function checkInequalities(cell) {
         
     }        
 }
-/*
-function checkHorizontalInequalities(cell) {
-    if (cell && cell.innerText != "" && cell.style.color != "red") {
-        var row = row = parseInt(cell.attributes.row.nodeValue);    
-        var col = col = parseInt(cell.attributes.col.nodeValue);
-        var left = $(row + "_" + (col-1));
-        var right = $(row + "_" + (col+1));        
-        if (left && right && left.innerText != "" && right.innerText != "") {
-            //alert(cell.innerText);      
-            if (cell.innerText == "＞" && left.innerText <= right.innerText) {
-                cell.style.color = "red";
-            } else if (cell.innerText == "＜" && left.innerText >= right.innerText) {
-                cell.style.color = "red";
-            } 
-        }
-        
-    }        
-}
 
-function checkVerticalInequalities(cell) {
+function checkRepeatDigits(cell, noRed) {
 
-    if (cell && cell.innerText != "" && cell.style.color != "red") {
-        var row = row = parseInt(cell.attributes.row.nodeValue);    
-        var col = col = parseInt(cell.attributes.col.nodeValue);
-        var up = $((row-1) + "_" + col);
-        var down = $((row+1) + "_" + col);
-        if (up && down && up.innerText != "" && down.innerText != "") {
-            if (cell.innerText == "∨" && up.innerText <= down.innerText) {
-                cell.style.color = "red";
-            } else if (cell.innerText == "∧" && up.innerText >= down.innerText) {
-                cell.style.color = "red";
-            }
-        }
-    }
-
-}*/
-
-function checkRepeatDigits(cell) {
-
-    var isRepeated = false;
     if (cell && cell.innerText != "" && cell.style.color != "red") {
         var row = row = parseInt(cell.attributes.row.nodeValue);    
         var col = col = parseInt(cell.attributes.col.nodeValue);
@@ -142,32 +111,28 @@ function checkRepeatDigits(cell) {
             var o = next(row,c);
             if (c+2 != col && cell.innerText == o.innerText) {
                 cell.style.color = o.style.color = "red";
-                isRepeated |= true;
             }        
         }
 
         for (var r = -2;  r < rowSize-2; r+=2) {        
             var o = down(r, col);
             if (r+2 != row && cell.innerText == o.innerText) {
-                cell.style.color = o.style.color = "red";
-                isRepeated |= true;
+                if (!noRed) {
+                    cell.style.color = o.style.color = "red";
+                }
             }
         }    
-
     }
-    
-    return isRepeated;
 }
 
 function checkAll() {
-    
-    if (!ChkCorrectness.checked) { 
+
+    if (!$("ChkCorrectness").checked) { 
         recoverColorAll();
         return; 
     }
     
     var cell;
-//    var noNumber = true;
     for (var row = 0; row < rowSize; row++) {
         for (var col = 0; col < rowSize; col++) {
             cell = $(row + "_" + col); 
@@ -234,10 +199,10 @@ function recoverColorOne(repeat,row,col) {
     
     var rowRepeated = 0;
     for (var r = -2;  r < rowSize-2; r+=2) {        
-        var o = down(r, col);
-        if (r+2 != row && o.style.color == "red" && o.innerText == repeat) {
+        var oDown = down(r, col);
+        if (r+2 != row && oDown.style.color == "red" && oDown.innerText == repeat) {
             if (++rowRepeated > 1) { break; }
-            repeatCell = o;
+            repeatCell = oDown;
         }
     }              
     if (rowRepeated == 1 && repeatCell) {
@@ -260,6 +225,7 @@ function recoverColorAll() {
 }
 
 function up(r, c) {
+
     var previousId = (r-2) + "_" + c;
     while (!$(previousId)) {
         if (c-2 >= 0) {
@@ -274,6 +240,7 @@ function up(r, c) {
 }
 
 function prev(r, c) {
+
     var previousId = r + "_" + (c-2);
     while (!$(previousId)) {
         if (r-2 >= 0) {
@@ -288,6 +255,7 @@ function prev(r, c) {
 }
 
 function next(r, c) {
+
     var previousId = r + "_" + (c+2);
     while (!$(previousId)) {
         if (r+2 <= rowSize) {
@@ -302,6 +270,7 @@ function next(r, c) {
 }
 
 function down(r, c) {
+
     var previousId = (r+2) + "_" + c;
     while (!$(previousId)) {
         if (c+2 <= rowSize) {
@@ -316,13 +285,13 @@ function down(r, c) {
 }
 
 function onKeyPressed() {
-//    if (ChkCorrectness.checked) {}
     
     key = event.keyCode;
-    var isRefreshKey = key == 116;    
+    var isRefreshKey = key == 116;       
+     
     var isArrow = key >= 37 && key <= 40;
     var isNum = key >= 48 && key <= 57;    
-    if (!currentCheckedCell && !isRefreshKey) { 
+    if (!currentCheckedCell) { 
         return false; 
     }
     
@@ -338,34 +307,43 @@ function onKeyPressed() {
   
     var r = parseInt(currentCheckedCell.attributes.row.nodeValue);
     var c = parseInt(currentCheckedCell.attributes.col.nodeValue);
+    var isWritable = currentCheckedCell.attributes.iswritable ? true : false;
         
-    if (key == 48 && currentCheckedCell.isSetByClient) {
+    if ((key == 48 || v == currentCheckedCell.innerText) && isWritable) {
+        var bac = currentCheckedCell.innerText;
+       // if (bac == v) { return false; }
         currentCheckedCell.innerText = "";
+        updt(r,c,"");
+        currentCheckedCell.style.color="#000000";
+        if ($("ChkCorrectness").checked) { 
+            recoverColor(true, bac, r, c);
+            recoverColorOfSign(r,c);
+        }         
+        
     } else if (isNum && currentCheckedCell.innerText == "" ){
+        updt(r,c,v);
         currentCheckedCell.innerText = v;    
-        currentCheckedCell.isSetByClient = true;
-        if (ChkCorrectness.checked) { 
+      //  currentCheckedCell.isSetByClient = true;
+        if ($("ChkCorrectness").checked) { 
             checkRepeatDigits(currentCheckedCell); 
             recoverColorOfSign(r,c);
         }        
-    } else if (isNum && currentCheckedCell.innertText != "" && currentCheckedCell.isSetByClient) {
+    } else if (isNum && currentCheckedCell.innertText != "" && isWritable) {
         var bac = currentCheckedCell.innerText;
         if (bac == v) { return false; }
         currentCheckedCell.innerText = v;
+        updt(r,c,v);
         currentCheckedCell.style.color = "#000000";
-        if (ChkCorrectness.checked ) {
+        if ($("ChkCorrectness").checked ) {
             checkRepeatDigits(currentCheckedCell);
             recoverColor(true, bac, r, c);
             checkInequalities(currentCheckedCell);
             recoverColorOfSign(r, c);
-        }
+        }        
     } else {
+        //updt(r,c,v);
     }
-    
-    
-  //  alert(key + "   " + (rowSize+1)/2 + "   " + event.value );
-//    var cId = currentCheckedCell.id;
-//    var rc = cId.split("_");        
+          
 
     switch (key) {
         case 37:
@@ -400,8 +378,116 @@ function onCellClick(c) {
         c.className = "number";
         currentCheckedCell = null;
     }
-}    
+} 
 
+
+function isFinished() {
+    
+    var f = true;
+    var count = 0;
+
+    for (var r = 0; r < rowSize; r++) {
+        for (var c = 0; c < rowSize; c++) {
+            cell = $(r + "_" + c);
+            if (cell.attributes.isnum) {
+                var v = cell.innerText != "";
+                if (!v) {
+                    count++;
+                    f &= v;
+                }
+            }
+        }
+    }
+    
+    if (!f) {
+        if (!confirm("There are " + count + " unfinished cells, are you sure you want to carry on?")) {
+            return {"f":false,"count":count};   
+        }  
+    }
+    //return true;
+    return {"f":true,"count":count};        
+}
+
+function setHidData() {
+
+    var status = FutoshikiTable.attributes.status.nodeValue;
+
+    // check the grid is finished or not   
+    var o = isFinished();  
+    if (!o.f) {
+        return false;
+    } else if (0 == o.count) {
+        // to tell server side, this game is finished but stil need double check.
+        status = -1;
+    }
+
+    var scale = (rowSize+1) / 2;    
+    var fid = FutoshikiTable.attributes.fid.nodeValue;
+    var str = "<Futoshiki Id=\"" + fid + "\" Scale=\"" + scale + "\" Status=\"" + status + "\">";
+    str += "<Cells>";
+    
+    for (var i = 0; i < f.Length; i++) {
+        str += "<Cell Row=\"" + f[i].row + "\" Col=\"" + f[i].col; 
+        str += "\" IsWritable=\"" + f[i].isWritable + "\">";
+        str += f[i].val + "</Cell>";    
+    }
+    str += "</Cells></Futoshiki>";     
+    $("HidData").value = str;
+    return true;
+}
+
+function checkSolution(){
+    return setHidData();  
+}
+
+function showSolution() {
+    var o = isFinished();
+    if (!o.f) {
+        return false;
+    }
+    $("HidData").value = FutoshikiTable.attributes.fid.nodeValue;
+}
+
+function resetGrid() {
+    for (var r = 0; r < rowSize; r++) {
+        for (var c = 0; c < rowSize; c++) {
+            cell = $(r + "_" + c);
+            var w = cell.attributes.iswritable ? true : false;
+            if (cell.attributes.isnum && w) {
+                cell.innerText = "";
+            }            
+            updt(r,c,cell.innerText,w);
+        }
+    }
+} 
+
+
+function preprocess() {
+
+    for (var r = 0; r < rowSize; r++) {
+        for (var c = 0; c < rowSize; c++) {
+            cell = $(r + "_" + c);
+            var w = cell.attributes.iswritable ? true : false;
+            updt(r,c,cell.innerText,w);
+        }
+    }
+    f.Length = rowSize*rowSize;
+}   
+
+function updt(r,c,v,w) {
+
+    var i = r*rowSize+c; 
+    if (!f[i]) {
+        var cell = {};
+        cell.row = r;
+        cell.col = c;
+        cell.val = v;
+        cell.isWritable = w;
+        f[i] = cell;
+    } else {
+        f[i].val = v;
+    }
+}
 
 function $(e) {
     return document.getElementById(e);
