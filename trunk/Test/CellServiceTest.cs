@@ -78,9 +78,9 @@ namespace Test
             int rowSize = 2*seedSize - 1;
             int candidatesAmount = seedSize;
             int cellsAmount = rowSize*rowSize;
-            CellService target = new CellService(seedSize);
+            FutoshkService target = new FutoshkService(seedSize);
 
-            Cell[] actualCells = target.DoGrid();  
+            Futoshiki actualCells = target.GetNewGrid(null);  
             showFutoshiki(actualCells, rowSize);
             
             // check the cells amount
@@ -96,21 +96,21 @@ namespace Test
 //            Assert.AreEqual(candidatesAmount-1,actualCells[2*rowSize].Candidates.Length);
 
 //             check a non-numeric cell
-            Cell signCell = new Cell {Row = 1, Column = 8};
-            Assert.AreEqual(signCell.IsNumeric, actualCells[rowSize].IsNumeric);
+            Cell signCell = new Cell {Row = 1, Col = 8};
+            Assert.AreEqual(signCell.IsNum, actualCells[rowSize].IsNum);
 
         }
 
-        private void showFutoshiki(Cell[] actualCells, int rowSize)
+        private void showFutoshiki(Futoshiki f, int rowSize)
         {
             Console.WriteLine("");
 
             int n = 0;
-            for (int i = 0; i < actualCells.Length; i++)
+            for (int i = 0; i < f.Length; i++)
             {                               
-//                if (actualCells[i].IsNumeric)
+//                if (actualCells[i].IsNum)
 //                {
-                    Console.Write("{0, 3}", actualCells[i].Value);
+                    Console.Write("{0, 3}", f[i].Val);
                     n++;
 //                }
                 if (n == rowSize)
